@@ -1,0 +1,27 @@
+<resources>
+    <string name="app_name">Telas</string>
+    <string name="et_insert">Nome de exibição</string>
+    <string name="btn_add">Adicionar</string>
+    <string name="txt_title">Itens</string>
+    <string name="txt_empty">Lista vazia</string>
+    <string name="tb_new">Novo</string>
+    <string name="tb_edit">Editar</string>
+    <string name="et_id">Posição do item a editar</string>
+    <string name="rv_items_description">Lista de itens</string>
+    <string name="etn_value"> Valor (R$)</string>
+    <string name="etn_qtd">Quantidade</string>
+    <string name="tb_go">Ir</string>
+    <string name="search_title">Buscar</string>
+    <string name="tb_remove">Remover</string>
+    <string name="tb_remove_on">Fazer</string>
+    <string-array name="spn_id_array">
+        <item>Placa de vídeo</item>
+        <item>CPU</item>
+        <item>Memória RAM</item>
+        <item>Fonte</item>
+        <item>Disco Rígido</item>
+        <item>Gabinete</item>
+        <item>Outro</item>
+    </string-array>
+
+</resources>

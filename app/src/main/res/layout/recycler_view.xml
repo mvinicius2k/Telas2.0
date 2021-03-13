@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingBottom="25dp">
+
+    <TextView
+        android:id="@+id/txt_left"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_weight="0"
+        android:fontFamily="sans-serif-black"
+        android:paddingStart="5dp"
+        android:paddingEnd="10dp"
+        android:textSize="30sp" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/txt_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif"
+            android:gravity="center_vertical|fill_vertical"
+            android:paddingStart="5dp"
+            android:paddingEnd="10dp"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/txt_qtd"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif"
+            android:gravity="center_vertical|fill_vertical"
+            android:paddingStart="5dp"
+            android:paddingEnd="10dp"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/txt_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif"
+            android:gravity="center_vertical|fill_vertical"
+            android:paddingStart="5dp"
+            android:paddingEnd="10dp"
+            android:textSize="14sp" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/txt_pos"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="start"
+        android:layout_margin="5dp"
+        android:layout_weight="0" />
+
+</LinearLayout>
