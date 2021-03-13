@@ -36,7 +36,6 @@ class Item (var name: String, var qtd:Int, var price: Float, var type: ItemType)
 
 
 
-    @SuppressLint("NewApi")
     fun getItemModel(): ItemModel{
         return ItemModel(name, qtd, price, type.ordinal, ServerValue.TIMESTAMP)
     }

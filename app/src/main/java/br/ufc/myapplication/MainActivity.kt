@@ -193,7 +193,6 @@ class MainActivity : AppCompatActivity() {
 
         listItems.addAll( fireBaseDB.getItems())
         listItemsSearch.addAll(listItems)
-        Toast.makeText(applicationContext,"Sem conexão com a Internet", Toast.LENGTH_SHORT).show()
 
         if(listItems.size > 0){
             runOnUiThread {

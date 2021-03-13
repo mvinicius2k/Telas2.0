@@ -35,7 +35,7 @@ class RecyclerAdapter (private val items: List<Item>) : RecyclerView.Adapter<Rec
         holder.txtLeft.text = items[position].getTypeChar().toString()
         holder.txtName.text = items[position].name
         holder.txtQtd.text = "Quatidade: " + items[position].qtd
-        holder.txtValue.text = "Quatidade: R$ " + items[position].getPriceStr()
+        holder.txtValue.text = "Preço: R$ " + items[position].getPriceStr()
         holder.txtPos.text = "#$position"
 
     }
