@@ -106,6 +106,7 @@ class MainActivity : AppCompatActivity() {
 
                 var pos : Int
 
+
                 try{
                     pos = etId.text.toString().toInt()
                 } catch (e : Exception){
@@ -152,10 +153,20 @@ class MainActivity : AppCompatActivity() {
             } else {
                 if(!etId.text.toString().isNullOrBlank()){
                     var removeLine = etId.text.toString().toInt()
-                    fireBaseDB.delete(listItems[removeLine])
-                    listItems.removeAt(removeLine)
-                    listItemsSearch.removeAt(removeLine)
-                    rvAdapter.notifyDataSetChanged()
+
+                    if(removeLine >= listItems.size || removeLine < 0){
+                        Toast.makeText(this, "Item " + etId.text.toString() + " não existe", Toast.LENGTH_SHORT).show()
+                        tbRemove.isChecked = true
+                        return@setOnCheckedChangeListener
+                    }
+
+                    tbRemove.isEnabled = false
+
+                    GlobalScope.launch (Dispatchers.IO){
+                        delete(listItems[removeLine], removeLine)
+                    }
+                    //fireBaseDB.delete()
+
                 }
 
 
@@ -190,8 +201,22 @@ class MainActivity : AppCompatActivity() {
 
 
 
+        val deferred = GlobalScope.async {
+            listItems.addAll( fireBaseDB.getItems())
+        }
 
-        listItems.addAll( fireBaseDB.getItems())
+        try {
+            deferred.await()
+        } catch (e: IOException){
+            runOnUiThread {
+                Toast.makeText(applicationContext, e.message, Toast.LENGTH_LONG).show()
+
+            }
+            finishActivity(0)
+            return@withContext
+        }
+
+
         listItemsSearch.addAll(listItems)
 
         if(listItems.size > 0){
@@ -258,9 +283,75 @@ class MainActivity : AppCompatActivity() {
     }
 
 
+    suspend fun insert(item: Item){
+        val deferred = GlobalScope.async {
+            fireBaseDB.insert(item)
+        }
+
+        try {
+            deferred.await()
+        } catch (e: IOException){
+            runOnUiThread {
+                Toast.makeText(applicationContext,e.message, Toast.LENGTH_SHORT).show()
+            }
+        }
+
+
+
+    }
+
+    suspend fun update(item: Item){
+        val deferred = GlobalScope.async {
+            fireBaseDB.update(item)
+        }
+
+        try {
+            deferred.await()
+        } catch (e: IOException){
+            runOnUiThread {
+                Toast.makeText(applicationContext,e.message, Toast.LENGTH_SHORT).show()
+            }
+        }
+
+
+
+    }
+
+    suspend fun delete(item: Item, removeLine: Int){
+        val deferred = GlobalScope.async {
+            fireBaseDB.delete(item)
+        }
+
+        try {
+            deferred.await()
+            listItems.removeAt(removeLine)
+            listItemsSearch.removeAt(removeLine)
+            runOnUiThread {
+                rvAdapter.notifyDataSetChanged()
+
+            }
+
+        } catch (e: IOException){
+            runOnUiThread {
+                Toast.makeText(applicationContext,e.message, Toast.LENGTH_SHORT).show()
+            }
+        } finally {
+            runOnUiThread {
+
+                tbRemove.isEnabled = true
+            }
+        }
+
+
+
+    }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
+        tbRemove.visibility = View.VISIBLE
+        tbNew.visibility = View.VISIBLE
+        tbEdit.visibility = View.VISIBLE
+
         if(requestCode in intArrayOf(ActivityKind.AddActivity_New.ordinal, ActivityKind.AddActivity_Edit.ordinal)){
             if(resultCode == Activity.RESULT_OK){
                 val item = data?.getSerializableExtra("item") as Item
@@ -270,15 +361,22 @@ class MainActivity : AppCompatActivity() {
                     listItems.add(item)
                     listItemsSearch.add(item)
 
-                    fireBaseDB.insert(item)
+                    GlobalScope.launch (Dispatchers.IO){
+                        insert(item)
+                    }
+
                 } else if(line > -1){ //Item editado
                     listItems[line] = item
                     listItemsSearch[line] = item
-                    fireBaseDB.update(item)
+                    GlobalScope.launch (Dispatchers.IO){
+                        update(item)
+                    }
+
                 }
 
 
                 rvItems.visibility = View.VISIBLE
+
                 rvAdapter.notifyDataSetChanged();
                 txtEmpty.visibility = View.GONE
 

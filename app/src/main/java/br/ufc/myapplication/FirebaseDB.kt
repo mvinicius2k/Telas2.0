@@ -1,14 +1,9 @@
 package br.ufc.myapplication
 
-import android.nfc.Tag
-import android.os.Build
 import android.util.Log
-import androidx.annotation.RequiresApi
-import com.google.android.gms.tasks.Task
 import com.google.firebase.database.*
-import com.google.firebase.database.ktx.database
-import com.google.firebase.database.ktx.getValue
-import com.google.firebase.ktx.Firebase
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import java.io.IOException
 import kotlin.math.log
@@ -29,72 +24,91 @@ class FirebaseDB {
     }
 
     @Throws(IOException::class)
-    fun insert(item: Item){
+    suspend fun insert(item: Item){
+
+        coroutineScope {
+            val id = referece.push().key
+
+            if(id == null){
+                Log.d(TAG,"id nulo")
+                launch {
+                    throw IOException("Erro de conexão")
+                }
+
+            }
+
+            referece.child("Items-$id").setValue(item.getItemModel())
+        }.await()
 
 
 
-        val id = referece.push().key
 
-        if(id == null){
-            Log.d(TAG,"id nulo")
-            throw IOException()
+    }
+
+    suspend fun update(item: Item){
+        coroutineScope {
+            referece.child(item.id!!).setValue(item.getItemModel()).addOnFailureListener {
+                throw IOException("Erro de conexão")
+            }.await()
         }
 
-        referece.child("Items-$id").setValue(item.getItemModel())
-    }
-
-    fun update(item: Item){
-        referece.child(item.id!!).setValue(item.getItemModel())
     }
 
 
-    fun delete(item: Item){
+    suspend fun delete(item: Item){
+
         delete(item.id!!)
     }
 
-    fun delete(id: String){
-        referece.child(id).removeValue()
+    suspend fun delete(id: String){
+        referece.child(id).removeValue().addOnFailureListener {
+            throw IOException("Falha de conexão")
+        }.await()
     }
 
     @Throws(IOException::class)
     suspend fun getItems(): ArrayList<Item>{
-
         val list = ArrayList<Item>()
-
-        val query = referece.get().addOnSuccessListener { dataSnapshot ->
-
-
-
-
-            val item = dataSnapshot.value as HashMap<*,*>
-
-            var id = ""
-
-            item.keys.forEach {
-                val values = item[it] as HashMap<*,*>
-                Log.d(TAG, it.toString())
-                id = it.toString()
-
-                list.add(Item.fromFirebase(id, values))
-
-
-            }
+        coroutineScope {
+            val query = referece.get().addOnSuccessListener { dataSnapshot ->
 
 
 
 
+                val item = dataSnapshot.value as HashMap<*,*>
 
-        }.addOnFailureListener{
-            Log.e("firebase", "Error getting data", it)
-            throw  IOException()
-        }.addOnCompleteListener {
+                var id = ""
 
-        }.await()
+                item.keys.forEach {
+                    val values = item[it] as HashMap<*,*>
+                    Log.d(TAG, it.toString())
+                    id = it.toString()
+
+                    list.add(Item.fromFirebase(id, values))
 
 
-         list.forEach {
-             //Log.i(TAG, "lista:\n$it")
-         }
+                }
+
+
+
+
+
+            }.addOnFailureListener{
+                Log.e("firebase", "Error getting data", it)
+                launch {
+                    throw  IOException("Sem conexão com a internet, tente novamente")
+                }
+
+            }.addOnCompleteListener {
+
+            }.await()
+        }
+
+
+
+
+
+
 
         return list
 
